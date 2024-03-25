@@ -44,11 +44,11 @@ if __name__ == '__main__':
 
          parser.add_argument("colspec", nargs="+", metavar="<name>=<expr>", type=colspec)
          
-         parser.add_argument("--float", "-F", dest="floatfmt", default="g",type=fmt_or_list,
+         parser.add_argument("--float", "-F", dest="floatfmt", type=fmt_or_list,default=[],
                              metavar="format[,format...]",
             help="format specifier for floating point numbers")
 
-         parser.add_argument("--int", "-I", dest="intfmt", default="g",type=fmt_or_list,
+         parser.add_argument("--int", "-I", dest="intfmt",type=fmt_or_list,default=[],
                              metavar="format[,format...]",
                              help="format specifier for integers")
          parser.add_argument("--format", "-f", dest="tablefmt", default="simple")
