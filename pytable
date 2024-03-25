@@ -1,0 +1,58 @@
+#!/usr/bin/python3
+from tabulate import tabulate
+from sys import stdin
+import math 
+
+def fmt_or_list(s:str):
+    fmts = s.split(',')
+    return fmts[0] if len(fmts)==1 else fmts
+
+def colspec(s:str) -> tuple[str,str]:
+    (col,code) = s.split('=', maxsplit=1)
+    return (col,code)
+
+def parse(s:str):
+    try:
+        return int(s)
+    except ValueError:
+        pass  # eww
+    try:
+        return float(s)
+    except ValueError:
+        pass  # I hate this
+    return s
+
+
+def table(colspec):
+    cols=dict(colspec)
+    header=[col for col in cols.keys() if not col.startswith('_')]
+    yield header
+    col_vals={}
+    for line in stdin:
+        col_vals['_']=parse(line.strip())
+        for (col,code) in cols.items():
+            col_vals[col] = eval(code, vars(math)| {'math':math}, col_vals)
+        yield [col_vals[col] for col in header]
+
+
+def main(colspec, **args):
+    print(tabulate(table(colspec), headers="firstrow", **args))
+
+if __name__ == '__main__':
+         from argparse import ArgumentParser
+         parser = ArgumentParser(description="Generate a table from a list of python expressions")
+
+         parser.add_argument("colspec", nargs="+", metavar="<name>=<expr>", type=colspec)
+         
+         parser.add_argument("--float", "-F", dest="floatfmt", default="g",type=fmt_or_list,
+                             metavar="format[,format...]",
+            help="format specifier for floating point numbers")
+
+         parser.add_argument("--int", "-I", dest="intfmt", default="g",type=fmt_or_list,
+                             metavar="format[,format...]",
+                             help="format specifier for integers")
+         parser.add_argument("--format", "-f", dest="tablefmt", default="simple")
+
+         args = parser.parse_args()
+         main(**vars(args))
+
