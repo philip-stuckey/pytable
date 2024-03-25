@@ -22,6 +22,19 @@ def parse(s:str):
         pass  # I hate this
     return s
 
+def update_linevars(vars: dict, line):
+    vars['_'] = parse(line.strip())
+    chunks=line.strip().split()
+    for n in range(0,10):
+        vars[f'_{n}'] = parse(chunks[n]) if n < len(chunks) else None
+    return vars
+
+def update_columns(col_vals: dict, cols):
+    global_vars = vars(math) | {'math':math}
+    for (col, code) in cols.items():
+        col_vals[col] = eval(code, global_vars, col_vals)
+    return col_vals
+
 
 def table(colspec):
     cols=dict(colspec)
@@ -29,9 +42,8 @@ def table(colspec):
     yield header
     col_vals={}
     for line in stdin:
-        col_vals['_']=parse(line.strip())
-        for (col,code) in cols.items():
-            col_vals[col] = eval(code, vars(math)| {'math':math}, col_vals)
+        col_vals = update_linevars(col_vals, line)
+        col_vals = update_columns(col_vals, cols)
         yield [col_vals[col] for col in header]
 
 
