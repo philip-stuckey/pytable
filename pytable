@@ -1,7 +1,11 @@
 #!/usr/bin/python3
 from tabulate import tabulate
 from sys import stdin
-import math 
+import math
+import importlib
+
+def modules(s:str) -> dict[str,]:
+    return {name: importlib.import_module(name) for name in s.split(',')}
 
 def fmt_or_list(s:str):
     fmts = s.split(',')
@@ -29,27 +33,27 @@ def update_linevars(vars: dict, line):
         vars[f'_{n}'] = parse(chunks[n]) if n < len(chunks) else None
     return vars
 
-def update_columns(col_vals: dict, cols):
-    global_vars = vars(math) | {'math':math}
+def update_columns(col_vals: dict, cols, modules):
+    global_vars = vars(math) | {'math':math} | modules
     for (col, code) in cols.items():
         global_vars['init'] = lambda x: col_vals.get(col,x)
         col_vals[col] = eval(code, global_vars, col_vals)
     return col_vals
 
 
-def table(colspec):
+def table(colspec,modules):
     cols=dict(colspec)
     header=[col for col in cols.keys() if not col.startswith('_')]
     yield header
     col_vals={}
     for line in stdin:
         col_vals = update_linevars(col_vals, line)
-        col_vals = update_columns(col_vals, cols)
+        col_vals = update_columns(col_vals, cols,modules)
         yield [col_vals[col] for col in header]
 
 
-def main(colspec, **args):
-    print(tabulate(table(colspec), headers="firstrow", **args))
+def main(colspec,modules, **args):
+    print(tabulate(table(colspec,modules), headers="firstrow", **args))
 
 if __name__ == '__main__':
          from argparse import ArgumentParser
@@ -65,7 +69,7 @@ if __name__ == '__main__':
                              metavar="format[,format...]",
                              help="format specifier for integers")
          parser.add_argument("--format", "-f", dest="tablefmt", default="simple")
-
+         parser.add_argument("--import", dest="modules", type=modules, default={})
          args = parser.parse_args()
          main(**vars(args))
 
