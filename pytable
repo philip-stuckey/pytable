@@ -32,6 +32,7 @@ def update_linevars(vars: dict, line):
 def update_columns(col_vals: dict, cols):
     global_vars = vars(math) | {'math':math}
     for (col, code) in cols.items():
+        global_vars['init'] = lambda x: col_vals.get(col,x)
         col_vals[col] = eval(code, global_vars, col_vals)
     return col_vals
 

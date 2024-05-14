@@ -39,7 +39,7 @@ yields
 ```
 
 
-expressions are evaluated in the order they appear in the argument list, this means that you can
+Expressions are evaluated in the order they appear in the argument list, this means that you can
 reference the values of other columns as long as you define the column first.
 
 This works
@@ -47,7 +47,7 @@ This works
 pytable a=_ b=_+1
 ```
 
-this does not 
+This does not 
 
 ```
 pytable b=_+1 a=_
@@ -88,3 +88,18 @@ and you can fully qualify names to disambiguate
 seq 1 10 | pytable a=_ log10=math.log10(a) ln=log(a) log2=math.log2(a)
 ```
 
+## Accumulators
+
+To implement, for instance, a cumulative sum, use
+
+```
+pytable cumsum='locals().get("cumsum",0) + n'
+```
+
+For convenience, this is given the shorthand
+
+```
+pytable cumsum='init(0)+n'
+```
+
+where `init(x)` returns the current column if it exists, or `x` otherwise.
