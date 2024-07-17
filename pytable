@@ -56,20 +56,28 @@ def main(colspec,modules, **args):
     print(tabulate(table(colspec,modules), headers="firstrow", **args))
 
 if __name__ == '__main__':
-         from argparse import ArgumentParser
-         parser = ArgumentParser(description="Generate a table from a list of python expressions")
+     from argparse import ArgumentParser
+     parser = ArgumentParser(description="Generate a table from a list of python expressions")
 
-         parser.add_argument("colspec", nargs="+", metavar="<name>=<expr>", type=colspec)
-         
-         parser.add_argument("--float", "-F", dest="floatfmt", type=fmt_or_list,default=[],
-                             metavar="format[,format...]",
-            help="format specifier for floating point numbers")
+     parser.add_argument("colspec", nargs="+", metavar="<name>=<expr>", type=colspec)
+     
+     parser.add_argument("--float", "-F", dest="floatfmt", type=fmt_or_list,default=[],
+                         metavar="format[,format...]",
+        help="format specifier for floating point numbers")
 
-         parser.add_argument("--int", "-I", dest="intfmt",type=fmt_or_list,default=[],
-                             metavar="format[,format...]",
-                             help="format specifier for integers")
-         parser.add_argument("--format", "-f", dest="tablefmt", default="simple")
-         parser.add_argument("--import", dest="modules", type=modules, default={})
-         args = parser.parse_args()
-         main(**vars(args))
+     parser.add_argument("--int", "-I", dest="intfmt",type=fmt_or_list,default=[],
+                         metavar="format[,format...]",
+                         help="format specifier for integers")
+     parser.add_argument("--format", "-f", dest="tablefmt", default="simple")
+
+     parser.add_argument(
+             "--import", 
+             dest="modules",
+             type=modules,
+             default={},
+             metavar='module[,module...]',
+             help="imports each module in a comma-separated list"
+     )
+     args = parser.parse_args()
+     main(**vars(args))
 
