@@ -26,9 +26,9 @@ def parse(s:str):
         pass  # I hate this
     return s
 
-def update_linevars(vars: dict, line):
+def update_linevars(vars: dict, line, field_separator=None):
     vars['_'] = parse(line.strip())
-    chunks=line.strip().split()
+    chunks=line.strip().split(field_separator)
     for n in range(0,10):
         vars[f'_{n}'] = parse(chunks[n]) if n < len(chunks) else None
     return vars
@@ -41,19 +41,19 @@ def update_columns(col_vals: dict, cols, modules):
     return col_vals
 
 
-def table(colspec,modules):
+def table(colspec,modules,field_sep):
     cols=dict(colspec)
     header=[col for col in cols.keys() if not col.startswith('_')]
     yield header
     col_vals={}
     for line in stdin:
-        col_vals = update_linevars(col_vals, line)
+        col_vals = update_linevars(col_vals, line, field_separator=field_sep)
         col_vals = update_columns(col_vals, cols,modules)
         yield [col_vals[col] for col in header]
 
 
-def main(colspec,modules, **args):
-    print(tabulate(table(colspec,modules), headers="firstrow", **args))
+def main(colspec,modules, field_separator, **args):
+    print(tabulate(table(colspec,modules,field_separator) , headers="firstrow", **args))
 
 if __name__ == '__main__':
      from argparse import ArgumentParser
@@ -78,6 +78,12 @@ if __name__ == '__main__':
              metavar='module[,module...]',
              help="imports each module in a comma-separated list"
      )
+     parser.add_argument(
+             "-s",
+             "--field-separator",
+             dest="field_separator",
+             default=None
+    )
      args = parser.parse_args()
      main(**vars(args))
 
